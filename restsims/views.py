@@ -11,26 +11,27 @@ except ImportError:
     import json
 import utils
 
-#@view_config(route_name='home', renderer='templates/mytemplate.pt')
-#def my_view(request):
-#    return {'project':'pyrasims'}
-
-
 tmpstore = FileUploadTempStore()
 
 class SimServerInteraction(colander.MappingSchema):
 
     action = colander.SchemaNode(colander.String(),
-            validator=colander.OneOf(['train','index','query']),
+            validator=colander.OneOf(['train','index','query',
+                                        'optimize', 'delete', 'status']),
             title = 'Choose action',
             description = 'Simserver action to perform',
             default = 'query',
             missing = 'query',
             widget = deform.widget.RadioChoiceWidget(
-                    values=(('query','Query'),
-                        ('train','Train'),
-                        ('index','Index'))
-                    ))
+                    values=(('query','Query indexed documents'),
+                        ('train','Train a corpus of documents'),
+                        ('index','Add documents to index'),
+                        ('delete', 'Delete documents from index'),
+                        ('optimize', 'Optimize the index'),
+                        ('status', 'Status'),
+                        )
+                    )
+            )
 
     format = colander.SchemaNode(colander.String(),
             validator=colander.OneOf(['json','html']),
@@ -63,15 +64,13 @@ class SimServerInteraction(colander.MappingSchema):
                 missing=0,
                 default = 0.5)
 
-
-
     max_results= colander.SchemaNode(colander.Int(),
                 validator = colander.Range(0, 200),
                 title = 'Max Results',
-                missing = 0,
+                missing = 100,
                 default = 100)
 
-class ProjectorViews(object):
+class SimServerViews(object):
     def __init__(self, request):
         self.request = request
 
@@ -83,7 +82,7 @@ class ProjectorViews(object):
         error = None
         data = None
         #settings = self.request.registry.settings
-        print 'ProjectorViews'
+        print 'SimServerViews'
         if 'submit' in self.request.POST:
             controls = self.request.POST.items()
             try:
@@ -92,17 +91,13 @@ class ProjectorViews(object):
                 error = e.render()
             if appstruct['action'] == 'query':
                 if appstruct['text']:
-                    data = appstruct['text']
+                    try:
+                        data = json.loads(appstruct['text'])
+                    except ValueError:
+                        data = appstruct['text']
                     min_score = appstruct['min_score']
                     max_results = appstruct['max_results']
                     result = utils.find_similar(data, min_score, max_results)
-                    if not result:
-                        self.request.response.status = '404 Not Found'
-                    if appstruct['format'] == 'json':
-                        self.request.response.content_type='application/json'
-                        response =  Response(json.dumps(result))
-                        response.content_type='application/json'
-                        return response
                 else:
                     error = "No data supplied"
             elif appstruct['action'] in ['train', 'index']:
@@ -121,6 +116,16 @@ class ProjectorViews(object):
                         result = utils.train(data)
                     elif appstruct['action'] == 'index':
                         result = utils.index(data)
+            elif appstruct['action'] == 'delete':
+                try:
+                    data = json.loads(appstruct['text'])
+                    result = utils.delete(data)
+                except ValueError:
+                    error = "Not valid json"
+            elif appstruct['action'] == 'optimize':
+                result = utils.optimize()
+            elif appstruct['action'] == 'status':
+                result = utils.status()
         if self.request.GET:
             controls = self.request.GET.items()
             try:
@@ -129,13 +134,22 @@ class ProjectorViews(object):
                 error = e.render()
             if appstruct['action'] == 'query':
                if appstruct['text']:
-                    data = appstruct['text']
+                    try:
+                        data = json.loads(appstruct['text'])
+                    except ValueError:
+                        data = appstruct['text']
                     min_score = appstruct['min_score']
                     max_results = appstruct['max_results']
                     result = utils.find_similar(data, min_score, max_results)
+            elif appstruct['action'] == 'status':
+                result = utils.status()
             else:
-                import ipdb; ipdb.set_trace()
-
-
+                #XXX
+                pass
+        if result != None:
+            if appstruct['format'] == 'json':
+                response =  Response(json.dumps(result))
+                response.content_type='application/json'
+                return response
 
         return {"error": error, "result": result, "form": myform.render()}

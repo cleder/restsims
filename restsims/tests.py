@@ -10,7 +10,9 @@ class ViewTests(unittest.TestCase):
         testing.tearDown()
 
     def test_my_view(self):
-        from .views import my_view
+        from .views import SimServerViews
         request = testing.DummyRequest()
-        info = my_view(request)
-        self.assertEqual(info['project'], 'pyrasims')
+        info = SimServerViews(request).site_view()
+        import ipdb; ipdb.set_trace()
+        self.assertEqual(info['result'], None)
+        self.assertEqual(info['error'], None)
