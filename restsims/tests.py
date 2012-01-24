@@ -13,6 +13,5 @@ class ViewTests(unittest.TestCase):
         from .views import SimServerViews
         request = testing.DummyRequest()
         info = SimServerViews(request).site_view()
-        import ipdb; ipdb.set_trace()
         self.assertEqual(info['result'], None)
         self.assertEqual(info['error'], None)

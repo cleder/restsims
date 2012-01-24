@@ -62,19 +62,21 @@ def _buffer(aservice, data):
 def train(data):
     service.set_autosession(False)
     service.open_session()
-    _buffer(service, data)
-    service.train()
+    i = _buffer(service, data)
+    service.train(method='lsi')
     #logger.info('training complete commit changes')
     service.commit()
+    service.set_autosession(True)
     return [i]
 
 def index(data):
     service.set_autosession(False)
     service.open_session()
-    _buffer(service, data)
+    i =_buffer(service, data)
     service.index()
     #logger.info('training complete commit changes')
     service.commit()
+    service.set_autosession(True)
     return [i]
 
 
@@ -84,6 +86,7 @@ def optimize():
     service.open_session()
     service.optimize()
     service.commit()
+    service.set_autosession(True)
     return ['index optimized']
 
 def delete(data):
@@ -91,6 +94,7 @@ def delete(data):
     service.open_session()
     service.delete(data)
     service.commit()
+    service.set_autosession(True)
     return ['documents deleted']
 
 def status():

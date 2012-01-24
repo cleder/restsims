@@ -3,18 +3,139 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>Sim Server Interaction</title>
-    <link rel="stylesheet" href="/deform_static/css/form.css"
-          type="text/css"
-            />
-    <script type="text/javascript"
-            src="/deform_static/scripts/jquery-1.4.2.min.js"></script>
-    <script type="text/javascript"
-            src="/deform_static/scripts/deform.js"></script>
 </head>
 <body>
   <h2>Interact with the simserver</h2>
   <div tal:condition="error">Error: <span tal:content="error"> Error message </span> </div>
   <div tal:condition="result">Result: <span tal:content="result"> Results </span> </div>
-  <div tal:content="structure form">form</div>
+  <form name="" method="post" action="."  enctype="multipart/form-data" accept-charset="utf-8">
+    <ul>
+        <li>
+          <input
+                 type="radio"
+                 name="action"
+                 value="query"
+                 id="action-query" checked="True"/>
+          <label for="action-query">Query indexed documents</label>
+        </li>
+        <li>
+          <input
+                 type="radio"
+                 name="action"
+                 value="train"
+                 id="action-train"/>
+          <label for="action-train">Train a corpus of documents</label>
+        </li>
+        <li>
+          <input
+                 type="radio"
+                 name="action"
+                 value="index"
+                 id="action-index"/>
+          <label for="action-index">Add documents to index</label>
+
+        </li>
+        <li>
+          <input
+                 type="radio"
+                 name="action"
+                 value="delete"
+                 id="action-delete"/>
+          <label for="action-delete">Delete documents from index</label>
+        </li>
+        <li>
+          <input
+                 type="radio"
+                 name="action"
+                 value="optimize"
+                 id="action-optimize"/>
+          <label for="action-optimize">Optimize the index</label>
+
+        </li>
+        <li>
+          <input
+                 type="radio"
+                 name="action"
+                 value="status"
+                 id="action-status"/>
+          <label for="action-status">Status</label>
+        </li>
+    </ul>
+
+    <input
+         type="radio"
+         name="format"
+         value="json"
+         id="format-json"/>
+
+    <label for="format-json">JSON</label>
+
+    <input
+         type="radio"
+         name="format"
+         value="html"
+         id="format-html" checked="True"/>
+    <label for="format-html">HTML</label>
+    <br/>
+    <input type="file" name="data" value=""
+         id="upload"/>
+    <label
+         class="desc"
+         title="File with documents to index or train"
+         for="upload"
+         >Upload File </label>
+
+    <br/>
+    <textarea
+          id="text"
+          name="text"></textarea>
+    <label
+         class="desc"
+         title="Input text to process"
+         for="text"
+         >Text</label>
+
+    <br/>
+    <input type="text" name="min_score" value="0.5"
+           id="min_score"/>
+    <label
+         class="desc"
+         title=""
+         for="min_score"
+         >Min Score
+    </label>
+    <br/>
+    <input type="text" name="max_results" value="100"
+           id="max_results"/>
+    <label
+         class="desc"
+         title=""
+         for="max_results"
+         >Max Results</label>
+    <br/>
+    <button
+      id="formsubmit"
+      name="submit"
+      type="submit"
+      class="btnText submit"
+      value="submit">
+    <span>Submit</span>
+    </button>
+
+
+    <button
+      id="formcancel"
+      name="cancel"
+      type="submit"
+      class="btnText submit"
+      value="cancel">
+    <span>Cancel</span>
+
+    </button>
+
+
+
+
+  </form>
 </body>
 </html>

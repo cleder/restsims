@@ -1,9 +1,5 @@
 from pyramid.view import view_config
 from pyramid.response import Response
-import colander
-import deform
-
-from deform.interfaces import FileUploadTempStore
 
 try:
     import simplejson as json
@@ -11,84 +7,57 @@ except ImportError:
     import json
 import utils
 
-tmpstore = FileUploadTempStore()
-
-class SimServerInteraction(colander.MappingSchema):
-
-    action = colander.SchemaNode(colander.String(),
-            validator=colander.OneOf(['train','index','query',
-                                        'optimize', 'delete', 'status']),
-            title = 'Choose action',
-            description = 'Simserver action to perform',
-            default = 'query',
-            missing = 'query',
-            widget = deform.widget.RadioChoiceWidget(
-                    values=(('query','Query indexed documents'),
-                        ('train','Train a corpus of documents'),
-                        ('index','Add documents to index'),
-                        ('delete', 'Delete documents from index'),
-                        ('optimize', 'Optimize the index'),
-                        ('status', 'Status'),
-                        )
-                    )
-            )
-
-    format = colander.SchemaNode(colander.String(),
-            validator=colander.OneOf(['json','html']),
-            title = 'Return Format',
-            default = 'html',
-            missing = 'json',
-            description = 'JSON/HTML',
-            widget = deform.widget.RadioChoiceWidget(
-                    values=(('json','JSON'),
-                        ('html','HTML'))
-                    ))
-
-
-    filedata = colander.SchemaNode(
-            deform.FileData(),
-            title = 'Upload File',
-            description = 'File with documents to index or train',
-            missing = '',
-            widget=deform.widget.FileUploadWidget(tmpstore)
-            )
-
-    text = colander.SchemaNode(colander.String(),
-            title = 'Text',
-            description = 'Input text to process',
-            missing = '',
-            widget=deform.widget.TextAreaWidget())
-
-    min_score = colander.SchemaNode(colander.Float(),
-                validator = colander.Range(0, 1),
-                missing=0,
-                default = 0.5)
-
-    max_results= colander.SchemaNode(colander.Int(),
-                validator = colander.Range(0, 200),
-                title = 'Max Results',
-                missing = 100,
-                default = 100)
-
 class SimServerViews(object):
     def __init__(self, request):
         self.request = request
 
+    def validate(self, params):
+        appstruct = {
+            'action': 'status',
+            'format': 'html',
+            'data': None,
+            'text': None,
+            'min_score': 0,
+            'max_results': 100}
+        if 'action' in params:
+            assert(params['action'] in ['train','index','query',
+                                    'optimize', 'delete', 'status'])
+            appstruct['action'] = params['action']
+        if 'format' in params:
+            assert(params['format'] in ['json', 'html'])
+            appstruct['format'] = params['format']
+        if 'data' in params:
+            if not isinstance(params['data'], basestring):
+                appstruct['data'] = self.request.POST['data'].file
+        if 'text' in params:
+            appstruct['text'] = params['text']
+        if 'min_score' in params:
+            min_score = float(params['min_score'])
+            assert(min_score > 0.0 and min_score < 1.0)
+            appstruct['min_score'] = min_score
+        if 'max_results' in params:
+            max_results = int(params['max_results'])
+            assert(max_results > 0)
+            appstruct['max_results'] = max_results
+        return appstruct
+
+
+
+
     @view_config(route_name='home', renderer="templates/interaction_view.pt")
     def site_view(self):
-        schema = SimServerInteraction()
-        myform = deform.Form(schema, buttons=('submit','cancel'))
+        #schema = SimServerInteraction()
+        #myform = deform.Form(schema, buttons=('submit','cancel'))
         result = None
         error = None
         data = None
         #settings = self.request.registry.settings
-        print 'SimServerViews'
-        if 'submit' in self.request.POST:
-            controls = self.request.POST.items()
-            try:
-                appstruct = myform.validate(controls)
-            except deform.ValidationFailure, e:
-                error = e.render()
+        if 'cancel' in self.request.params:
+            # just render the form
+            return {"error": error, "result": result}
+        else:
+            controls = self.request.params
+            appstruct = self.validate(controls)
             if appstruct['action'] == 'query':
                 if appstruct['text']:
                     try:
@@ -106,8 +75,8 @@ class SimServerViews(object):
                         data = json.loads(appstruct['text'])
                     except ValueError:
                         error = "Not valid json"
-                elif appstruct['filedata']:
-                    afile = appstruct['filedata']['fp']
+                elif appstruct['data']:
+                    afile = appstruct['data']
                     data = utils.extract_from_archive(afile)
                 else:
                     error = "No data supplied"
@@ -126,30 +95,12 @@ class SimServerViews(object):
                 result = utils.optimize()
             elif appstruct['action'] == 'status':
                 result = utils.status()
-        if self.request.GET:
-            controls = self.request.GET.items()
-            try:
-                appstruct = myform.validate(controls)
-            except deform.ValidationFailure, e:
-                error = e.render()
-            if appstruct['action'] == 'query':
-               if appstruct['text']:
-                    try:
-                        data = json.loads(appstruct['text'])
-                    except ValueError:
-                        data = appstruct['text']
-                    min_score = appstruct['min_score']
-                    max_results = appstruct['max_results']
-                    result = utils.find_similar(data, min_score, max_results)
-            elif appstruct['action'] == 'status':
-                result = utils.status()
-            else:
-                #XXX
-                pass
+
         if result != None:
             if appstruct['format'] == 'json':
                 response =  Response(json.dumps(result))
                 response.content_type='application/json'
                 return response
 
-        return {"error": error, "result": result, "form": myform.render()}
+        return {"error": error, "result": result}
+

@@ -11,8 +11,6 @@ requires = [
     'pyramid_debugtoolbar',
     'waitress',
     'simserver',
-    'colander',
-    'deform',
     ]
 
 setup(name='restsims',
