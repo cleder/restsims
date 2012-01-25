@@ -99,3 +99,10 @@ def delete(data):
 
 def status():
     return [service.status()]
+
+def indexed_documents():
+    return service.keys()
+
+def is_indexed(doc):
+    return [doc in service.keys()]
+

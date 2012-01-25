@@ -60,6 +60,14 @@
                  id="action-status"/>
           <label for="action-status">Status</label>
         </li>
+        <li>
+          <input
+                 type="radio"
+                 name="action"
+                 value="documents"
+                 id="action-documents"/>
+          <label for="action-documents">Indexed documents</label>
+        </li>
     </ul>
 
     <input

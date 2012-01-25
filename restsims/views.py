@@ -20,8 +20,9 @@ class SimServerViews(object):
             'min_score': 0,
             'max_results': 100}
         if 'action' in params:
-            assert(params['action'] in ['train','index','query',
-                                    'optimize', 'delete', 'status'])
+            assert(params['action'] in ['train', 'index', 'query',
+                                    'optimize', 'delete', 'status',
+                                    'documents'])
             appstruct['action'] = params['action']
         if 'format' in params:
             assert(params['format'] in ['json', 'html'])
@@ -95,7 +96,8 @@ class SimServerViews(object):
                 result = utils.optimize()
             elif appstruct['action'] == 'status':
                 result = utils.status()
-
+            elif appstruct['action'] == 'documents':
+                result = utils.indexed_documents()
         if result != None:
             if appstruct['format'] == 'json':
                 response =  Response(json.dumps(result))
