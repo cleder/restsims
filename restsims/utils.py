@@ -32,12 +32,15 @@ def find_similar(data, min_score, max_results):
         if ' ' in doc:
             doc = {'tokens': utils.simple_preprocess(data)}
         try:
-            return service.find_similar(doc, min_score=min_score, max_results=max_results)
+            return {'status': 'OK', 'response':
+                                service.find_similar(doc,
+                                min_score=min_score,
+                                max_results=max_results)}
         except ValueError:
-            return []
+            return {'status': 'NOTFOUND', 'response':[]}
     else:
+        result = {}
         for doc in data:
-            result = {}
             try:
                 result[doc] = (service.find_similar(
                                 doc,
@@ -45,7 +48,10 @@ def find_similar(data, min_score, max_results):
                                 max_results=max_results))
             except ValueError:
                 pass
-        return result
+        if result:
+            return {'status': 'OK', 'response': result}
+        else:
+            return {'status': 'NOTFOUND', 'response':[]}
 
 def _buffer(aservice, data):
     i = 0
@@ -67,7 +73,7 @@ def train(data):
     #logger.info('training complete commit changes')
     service.commit()
     service.set_autosession(True)
-    return [i]
+    return {'status': 'OK', 'response':i}
 
 def index(data):
     service.set_autosession(False)
@@ -77,7 +83,7 @@ def index(data):
     #logger.info('training complete commit changes')
     service.commit()
     service.set_autosession(True)
-    return [i]
+    return {'status': 'OK', 'response':i}
 
 
 
@@ -87,7 +93,7 @@ def optimize():
     service.optimize()
     service.commit()
     service.set_autosession(True)
-    return ['index optimized']
+    return {'status': 'OK', 'response': 'index optimized'}
 
 def delete(data):
     service.set_autosession(False)
@@ -95,14 +101,14 @@ def delete(data):
     service.delete(data)
     service.commit()
     service.set_autosession(True)
-    return ['documents deleted']
+    return {'status': 'OK', 'response': 'documents deleted'}
 
 def status():
-    return [service.status()]
+    return {'status': 'OK', 'response': service.status()}
 
 def indexed_documents():
-    return service.keys()
+    return {'status': 'OK', 'response': service.keys()}
 
 def is_indexed(doc):
-    return [doc in service.keys()]
+    return {'status': 'OK', 'response': doc in service.keys()}
 
