@@ -68,6 +68,14 @@
                  id="action-documents"/>
           <label for="action-documents">Indexed documents</label>
         </li>
+        <li>
+          <input
+                 type="radio"
+                 name="action"
+                 value="is_indexed"
+                 id="action-is_indexed"/>
+          <label for="action-is_indexed">Is the document indexed</label>
+        </li>
     </ul>
 
     <input

@@ -6,6 +6,7 @@ try:
 except ImportError:
     import json
 import utils
+import simservice
 
 class SimServerViews(object):
     def __init__(self, request):
@@ -22,7 +23,7 @@ class SimServerViews(object):
         if 'action' in params:
             assert(params['action'] in ['train', 'index', 'query',
                                     'optimize', 'delete', 'status',
-                                    'documents'])
+                                    'documents', 'is_indexed'])
             appstruct['action'] = params['action']
         if 'format' in params:
             assert(params['format'] in ['json', 'html'])
@@ -47,8 +48,6 @@ class SimServerViews(object):
 
     @view_config(route_name='home', renderer="templates/interaction_view.pt")
     def site_view(self):
-        #schema = SimServerInteraction()
-        #myform = deform.Form(schema, buttons=('submit','cancel'))
         result = None
         error = None
         data = None
@@ -67,7 +66,7 @@ class SimServerViews(object):
                         data = appstruct['text']
                     min_score = appstruct['min_score']
                     max_results = appstruct['max_results']
-                    result = utils.find_similar(data, min_score, max_results)
+                    result = simservice.find_similar(data, min_score, max_results)
                 else:
                     error = "No data supplied"
             elif appstruct['action'] in ['train', 'index']:
@@ -83,21 +82,23 @@ class SimServerViews(object):
                     error = "No data supplied"
                 if data:
                     if appstruct['action'] == 'train':
-                        result = utils.train(data)
+                        result = simservice.train(data)
                     elif appstruct['action'] == 'index':
-                        result = utils.index(data)
+                        result = simservice.index(data)
             elif appstruct['action'] == 'delete':
                 try:
                     data = json.loads(appstruct['text'])
-                    result = utils.delete(data)
+                    result = simservice.delete(data)
                 except ValueError:
                     error = "Not valid json"
             elif appstruct['action'] == 'optimize':
-                result = utils.optimize()
+                result = simservice.optimize()
             elif appstruct['action'] == 'status':
-                result = utils.status()
+                result = simservice.status()
             elif appstruct['action'] == 'documents':
-                result = utils.indexed_documents()
+                result = simservice.indexed_documents()
+            elif appstruct['action'] == 'is_indexed':
+                result = simservice.is_indexed(appstruct['text'])
         if result != None:
             if appstruct['format'] == 'json':
                 response =  Response(json.dumps(result))
