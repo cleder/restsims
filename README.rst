@@ -228,6 +228,7 @@ By a plain text that will be compared to the indexed documents
 e.g.
 
 ::
+
     {'status': 'OK', 'response': [('e82c58f43cec4db96f0cda25e5a1b2ba', 0.6676519513130188, None),
     ('13ea18dd855582ad23c9dabf5041aa1a', 0.6201680898666382, None),
     ('89734760899b4324fe9dff147d842b2b', 0.5058814883232117, None)]}
@@ -245,7 +246,9 @@ By a list of documents [UID,]
 
 
 e.g.
-    ::
+
+::
+
     {'status': 'OK', 'response':
         {u'7d6342a60159eca02b54340c3d352ecd':
             [('7d6342a60159eca02b54340c3d352ecd', 1.0, None),
