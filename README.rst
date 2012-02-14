@@ -28,6 +28,7 @@ virtual environment and buildout.
 
 restsims comes with an example buildout.cfg file
 in the tarball, or you find it on github.
+https://github.com/cleder/restsims/blob/master/buildout.cfg
 
 copy buildout.cfg into the simserver directory
 
@@ -109,6 +110,8 @@ applications. It returns its results as html or JSON. The HTML view is
 meant for experiments and to make yourself aquainted with the
 calls and responses.
 
+Please refer to http://radimrehurek.com/gensim/simserver.html for a more
+in depth documentation for simserver itself.
 
 
 status
