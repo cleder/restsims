@@ -68,7 +68,9 @@ $ bin/buildout
 The buildout will take a while and install all the dependencies
 for the server. Start the server with:
 
-$ bin/pserve src/restsims/development.ini
+::
+
+    $ bin/pserve src/restsims/development.ini
 
 Now you can access the server at http://localhost:6543/
 
