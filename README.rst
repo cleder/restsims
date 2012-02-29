@@ -316,6 +316,22 @@ To find out if a certain document is in the index:
     Response = {'status': 'OK', 'response': True/False}
 
 
+
+TODO
+=====
+
+authentication, signup
+
+multiple indexes per restsims server
+
+TTW creation of indexes
+
+use http://pypi.python.org/pypi/itsdangerous/ for signing
+
+
+
+
+
 Links
 =====
 
