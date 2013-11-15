@@ -24,7 +24,7 @@ virtual environment and buildout.
     $ mkdir buildout-cache/eggs
     $ mkdir buildout-cache/downloads
     $ mkdir src # for  LAPACK, BLAS and restsims
-    $ wget http://python-distribute.org/bootstrap.py
+    $ mkdir var
 
 restsims comes with an example buildout.cfg file
 in the tarball, or you find it on github.
@@ -34,6 +34,7 @@ copy buildout.cfg into the simserver directory
 
 ::
 
+    $ wget http://python-distribute.org/bootstrap.py
     $ bin/python bootstrap.py
 
 you can try to easy_install numpy and scipy
@@ -47,9 +48,12 @@ but this never worked for me so i installed it from source
 http://www.scipy.org/Download
 as documented in
 http://scipy.org/Installing_SciPy/BuildingGeneral
-the buildout assumes that LAPACK and BLAS are installed in the src
-directory
+the buildout assumes that LAPACK_ and BLAS_ are installed in the lib
+directory. Also consider installing the ATLAS_ library as it gives you
+a considerable performance boost.
 
+Alternatively you can use the recipe described in
+http://reinout.vanrees.org/weblog/2013/09/11/system-eggs-in-your-buildout.html
 
 test if numpy and scipy are installed correctly:
 
@@ -64,7 +68,7 @@ run buildout
 
 ::
 
-$ bin/buildout
+    $ bin/buildout
 
 The buildout will take a while and install all the dependencies
 for the server. Start the server with:
@@ -97,9 +101,12 @@ At the end of the file
 ::
 
     [simserver]
-    path=/tmp/simmserver/
+    path=var/
 
 is the location of the simserver index
+
+You can provide your own stopword file as stopwords.txt. If you do not
+provide a stopwordfile it falls back to the built in english stopwords.
 
 
 API
@@ -326,7 +333,7 @@ multiple indexes per restsims server
 
 TTW creation of indexes
 
-use http://pypi.python.org/pypi/itsdangerous/ for signing
+.. use http://pypi.python.org/pypi/itsdangerous/ for signing
 
 
 
@@ -338,3 +345,8 @@ Links
 - Code repository: https://github.com/cleder/restsims
 - Questions and comments to gensim@googlegroups.com
 - Report bugs at https://github.com/cleder/restsims/issues
+
+.. _LAPACK: http://www.netlib.org/lapack/
+.. _BLAS: http://www.netlib.org/blas/
+.. _ATLAS: http://math-atlas.sourceforge.net/
+

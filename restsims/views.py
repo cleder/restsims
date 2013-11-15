@@ -43,15 +43,11 @@ class SimServerViews(object):
             appstruct['max_results'] = max_results
         return appstruct
 
-
-
-
     @view_config(route_name='home', renderer="templates/interaction_view.pt")
     def site_view(self):
         result = None
         error = None
         data = None
-        #settings = self.request.registry.settings
         if 'cancel' in self.request.params:
             # just render the form
             return {"error": error, "result": result}
@@ -106,4 +102,3 @@ class SimServerViews(object):
                 return response
 
         return {"error": error, "result": result}
-

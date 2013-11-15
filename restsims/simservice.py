@@ -1,7 +1,8 @@
+import logging
 import sys
 import ConfigParser
 from simserver import SessionServer
-from gensim import utils
+from .utils import simple_preprocess
 
 config = ConfigParser.SafeConfigParser()
 config.read([c for c in sys.argv if c.endswith('.ini')])
@@ -10,6 +11,9 @@ try:
 except:
     path = '/tmp/simserver/'
 
+logger = logging.getLogger(__file__)
+
+
 service = SessionServer(path)
 
 
@@ -17,7 +21,7 @@ def find_similar(data, min_score, max_results):
     if isinstance(data, basestring):
         doc = data.strip()
         if ' ' in doc:
-            doc = {'tokens': utils.simple_preprocess(data)}
+            doc = {'tokens': simple_preprocess(data)}
         try:
             return {'status': 'OK', 'response':
                                 service.find_similar(doc,
@@ -47,7 +51,7 @@ def _buffer(aservice, data):
             aservice.buffer([{'id': d['id'], 'tokens': d['tokens']}])
         else:
             aservice.buffer([{'id': d['id'],
-                'tokens': utils.simple_preprocess(d['text'])}])
+                'tokens': simple_preprocess(d['text'])}])
         i+=1
     return i
 
@@ -57,7 +61,7 @@ def train(data):
     service.open_session()
     i = _buffer(service, data)
     service.train(method='lsi')
-    #logger.info('training complete commit changes')
+    logger.info('training complete commit changes')
     service.commit()
     service.set_autosession(True)
     return {'status': 'OK', 'response':i}
@@ -67,7 +71,7 @@ def index(data):
     service.open_session()
     i =_buffer(service, data)
     service.index()
-    #logger.info('training complete commit changes')
+    logger.info('indexing complete commit changes')
     service.commit()
     service.set_autosession(True)
     return {'status': 'OK', 'response':i}

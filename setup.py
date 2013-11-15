@@ -11,6 +11,7 @@ requires = [
     'pyramid_debugtoolbar',
     'waitress',
     'simserver',
+    'Bottleneck',
     ]
 
 setup(name='restsims',
