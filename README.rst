@@ -5,10 +5,12 @@ Introduction
 
 It provides a basic HTML interface to test and play around with the service.
 
-_WARNING!_
+**WARNING!**: restsims does not yet support authentication so you
+do NOT want to USE it on a PUBLIC network, but behind a firewall only
 
-restsims does not yet do authentication so you
-do NOT want to USE it on a PUBLIC network
+I use it in production since early 2012 and did not experience any problems
+with it.
+
 
 INSTALL
 ========
@@ -49,8 +51,12 @@ http://www.scipy.org/Download
 as documented in
 http://scipy.org/Installing_SciPy/BuildingGeneral
 the buildout assumes that LAPACK_ and BLAS_ are installed in the lib
-directory. Also consider installing the ATLAS_ library as it gives you
-a considerable performance boost.
+directory.
+
+It is also recommended you install a fast BLAS_ library prior to installing NumPy.
+This is optional, but using an optimized BLAS_ such as ATLAS_ or OpenBLAS_
+is known to improve performance by as much as an order of magnitude.
+
 
 Alternatively you can use the recipe described in
 http://reinout.vanrees.org/weblog/2013/09/11/system-eggs-in-your-buildout.html
@@ -327,16 +333,12 @@ To find out if a certain document is in the index:
 TODO
 =====
 
-authentication, signup
+- Authentication, signup
+- Multiple indexes per restsims server
+- TTW creation of indexes
+- multilingual support with https://github.com/miha-stopar/gensim
 
-multiple indexes per restsims server
-
-TTW creation of indexes
-
-.. use http://pypi.python.org/pypi/itsdangerous/ for signing
-
-
-
+.. note to self: maybe use http://pypi.python.org/pypi/itsdangerous/ for signing
 
 
 Links
@@ -348,5 +350,6 @@ Links
 
 .. _LAPACK: http://www.netlib.org/lapack/
 .. _BLAS: http://www.netlib.org/blas/
+.. _OPENBLAS: http://www.openblas.net/
 .. _ATLAS: http://math-atlas.sourceforge.net/
 
