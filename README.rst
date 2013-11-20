@@ -1,7 +1,7 @@
 Introduction
 =============
 
-*restsims* is a small pyramid restfull wrapper around simserver itself.
+*restsims* is a small pyramid restfull wrapper around simserver_ and gensim_.
 
 It provides a basic HTML interface to test and play around with the service.
 
@@ -39,7 +39,7 @@ copy buildout.cfg into the simserver directory
     $ wget http://python-distribute.org/bootstrap.py
     $ bin/python bootstrap.py
 
-you can try to easy_install numpy and scipy
+you can try to easy_install numpy_ and scipy_
 
 ::
 
@@ -58,10 +58,13 @@ This is optional, but using an optimized BLAS_ such as ATLAS_ or OpenBLAS_
 is known to improve performance by as much as an order of magnitude.
 
 
-Alternatively you can use the recipe described in
+Alternatively you can install numpy_ and scipy_  with the package manage
+of your distribution and use the recipe described in
 http://reinout.vanrees.org/weblog/2013/09/11/system-eggs-in-your-buildout.html
+Note that the libraries that come with your distibution are normally
+NOT optimized for speed.
 
-test if numpy and scipy are installed correctly:
+Test if numpy and scipy are installed correctly:
 
 ::
 
@@ -348,6 +351,11 @@ Links
 - Questions and comments to gensim@googlegroups.com
 - Report bugs at https://github.com/cleder/restsims/issues
 
+
+.. _numpy: https://pypi.python.org/pypi/numpy
+.. _scipy: https://pypi.python.org/pypi/scipy
+.. _gensim: https://pypi.python.org/pypi/gensim
+.. _simserver: https://pypi.python.org/pypi/simserver
 .. _LAPACK: http://www.netlib.org/lapack/
 .. _BLAS: http://www.netlib.org/blas/
 .. _OPENBLAS: http://www.openblas.net/
