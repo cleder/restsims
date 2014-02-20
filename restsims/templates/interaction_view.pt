@@ -129,6 +129,14 @@
          for="max_results"
          >Max Results</label>
     <br/>
+    <input type="checkbox" name="model_confirmation" value="1"
+           id="model_confirmation"/>
+    <label
+         class="desc"
+         title=""
+         for="model_confirmation"
+         >Confirm that you want to create a new model</label>
+    <br/>
     <button
       id="formsubmit"
       name="submit"

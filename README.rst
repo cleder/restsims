@@ -6,7 +6,7 @@ Introduction
 It provides a basic HTML interface to test and play around with the service.
 
 **WARNING!**: restsims does not yet support authentication so you
-do NOT want to USE it on a PUBLIC network, but behind a firewall only
+do NOT want to USE it on a PUBLIC network, but behind a firewall only.
 
 I use it in production since early 2012 and did not experience any problems
 with it.
@@ -47,8 +47,7 @@ you can try to easy_install numpy_ and scipy_
     $ bin/easy_install scipy
 
 but this never worked for me so i installed it from source
-http://www.scipy.org/Download
-as documented in
+http://www.scipy.org/Download as documented in
 http://scipy.org/Installing_SciPy/BuildingGeneral
 the buildout assumes that LAPACK_ and BLAS_ are installed in the lib
 directory.

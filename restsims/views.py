@@ -1,3 +1,4 @@
+import os
 from pyramid.view import view_config
 from pyramid.response import Response
 
@@ -8,7 +9,14 @@ except ImportError:
 import utils
 import simservice
 
+#service = simservice.SimService(os.path.join(simservice.path, 'unigram'),
+#    preprocess = utils.simple_preprocess, deaccent=True, lowercase=True)
+
+service = simservice.SimService(os.path.join(simservice.path, 'bigram'),
+    preprocess = utils.bigram_preprocess, deaccent=True, lowercase=True)
+
 class SimServerViews(object):
+
     def __init__(self, request):
         self.request = request
 
@@ -19,7 +27,8 @@ class SimServerViews(object):
             'data': None,
             'text': None,
             'min_score': 0,
-            'max_results': 100}
+            'max_results': 100,
+            'model_confirmation': False}
         if 'action' in params:
             assert(params['action'] in ['train', 'index', 'query',
                                     'optimize', 'delete', 'status',
@@ -41,6 +50,9 @@ class SimServerViews(object):
             max_results = int(params['max_results'])
             assert(max_results > 0)
             appstruct['max_results'] = max_results
+        if 'model_confirmation' in params:
+            model_confirmation = bool(int(params['model_confirmation']))
+            appstruct['model_confirmation'] = model_confirmation
         return appstruct
 
     @view_config(route_name='home', renderer="templates/interaction_view.pt")
@@ -62,7 +74,7 @@ class SimServerViews(object):
                         data = appstruct['text']
                     min_score = appstruct['min_score']
                     max_results = appstruct['max_results']
-                    result = simservice.find_similar(data, min_score, max_results)
+                    result = service.find_similar(data, min_score, max_results)
                 else:
                     error = "No data supplied"
             elif appstruct['action'] in ['train', 'index']:
@@ -78,23 +90,31 @@ class SimServerViews(object):
                     error = "No data supplied"
                 if data:
                     if appstruct['action'] == 'train':
-                        result = simservice.train(data)
+                        try:
+                            # has the service a model?
+                            has_model = bool(service.service.stable.model)
+                        except:
+                            has_model = False
+                        if appstruct['model_confirmation'] or not has_model:
+                            result = service.train(data)
+                        else:
+                            error = "confirmation required to train new model and thus loosing all previous training data"
                     elif appstruct['action'] == 'index':
-                        result = simservice.index(data)
+                        result = service.index(data)
             elif appstruct['action'] == 'delete':
                 try:
                     data = json.loads(appstruct['text'])
-                    result = simservice.delete(data)
+                    result = service.delete(data)
                 except ValueError:
                     error = "Not valid json"
             elif appstruct['action'] == 'optimize':
-                result = simservice.optimize()
+                result = service.optimize()
             elif appstruct['action'] == 'status':
-                result = simservice.status()
+                result = service.status()
             elif appstruct['action'] == 'documents':
-                result = simservice.indexed_documents()
+                result = service.indexed_documents()
             elif appstruct['action'] == 'is_indexed':
-                result = simservice.is_indexed(appstruct['text'])
+                result = service.is_indexed(appstruct['text'])
         if result != None:
             if appstruct['format'] == 'json':
                 response =  Response(json.dumps(result))
