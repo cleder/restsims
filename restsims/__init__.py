@@ -10,7 +10,7 @@ def main(global_config, **settings):
     """
     try:
         f = open('stopwords.txt', 'r')
-        utils.STOPWORDS = frozenset(w for w in f.read().split() if w)
+        utils.STOPWORDS = frozenset(w.encode('utf8') for w in f.read().split() if w)
         f.close()
         logger.info('using stopwords.txt file with %i stopwords' % len(utils.STOPWORDS))
     except:

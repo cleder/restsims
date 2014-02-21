@@ -36,36 +36,61 @@ yet you
 your yours yourself yourselves
 i ii iii iv v vi vii viii ix x xi xii xiii xiv xv xvi xvii xviii xix xx xxi xxii xxiii xxiv xxv xxvi xxvii xxviii xxix xxx
 """
-STOPWORDS = frozenset(w for w in STOPWORDS.split() if w)
+STOPWORDS = frozenset(w.encode('utf8') for w in STOPWORDS.split() if w)
 
 SPLIT_SENTENCES = re.compile(u"[.!?:]\s+")  # split sentences on '.!?:' characters
 
+def stem_tokenize(doc, deacc=True, lowercase=True, errors="strict", stemmer=None):
+    """ Split into words and stem that word if a stemmer is given"""
+    if stemmer is None:
+        for token in tokenize(doc, lowercase=lowercase, deacc=deacc, errors=errors):
+            yield token
+    else:
+         for token in tokenize(doc, lowercase=lowercase, deacc=deacc, errors=errors):
+            yield stemmer.stemWord(token)
 
-def simple_preprocess(doc, deacc=True, lowercase=True):
+
+def simple_preprocess(doc, deacc=True, lowercase=True, errors='ignore',
+    stemmer=None, stopwords=None):
     """
     Convert a document into a list of tokens.
 
     This lowercases, tokenizes, stems, normalizes etc. -- the output are final,
     utf8 encoded strings that won't be processed any further.
     """
-    tokens = [token.encode('utf8') for token in
-                tokenize(doc, lowercase=lowercase, deacc=deacc, errors='ignore')
-            if 2 <= len(token) <= 25 and
-                not token.startswith('_') and
-                token not in STOPWORDS]
-    return tokens
+    if not stopwords:
+        stopwords = []
+    #tokens = [token.encode('utf8') for token in
+    #            tokenize(doc, lowercase=lowercase, deacc=deacc, errors=errors)
+    #        if 2 <= len(token) <= 25 and
+    #            not token.startswith('_') and
+    #            token not in STOPWORDS]
+    #return tokens
+    for token in stem_tokenize(doc, lowercase=lowercase, deacc=deacc, errors=errors, stemmer=stemmer):
+        if 2 <= len(token) <= 25 and not token.startswith(u'_') and token not in stopwords:
+            yield token.encode('utf8')
 
-def bigram_preprocess(doc, deacc=True, lowercase=True):
+
+
+def bigram_preprocess(doc, deacc=True, lowercase=True, errors='ignore',
+    stemmer=None, stopwords=None):
+    """
+    Convert a document into a list of tokens.
+
+    Split text into sentences and sentences into bigrams.
+    the bigrams returned are the tokens
+    """
     bigrams = []
     #split doc into sentences
     for sentence in SPLIT_SENTENCES.split(doc):
         #split sentence into tokens
-        tokens = simple_preprocess(sentence, deacc, lowercase)
+        tokens = list(simple_preprocess(sentence, deacc, lowercase, errors=errors,
+            stemmer=stemmer, stopwords=stopwords))
         #construct bigrams from tokens
         if len(tokens) >1:
             for i in range(0,len(tokens)-1):
-                bigrams.append(tokens[i] + '_' + tokens[i+1])
-    return bigrams
+                yield tokens[i] + '_' + tokens[i+1]
+
 
 
 def extract_from_archive(afile):

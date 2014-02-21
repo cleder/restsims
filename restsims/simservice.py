@@ -15,17 +15,22 @@ logger = logging.getLogger(__file__)
 
 class SimService(object):
 
-    def __init__(self, path, preprocess, deaccent=True, lowercase=True):
+    def __init__(self, path, preprocess, deaccent=True, lowercase=True,
+        stemmer=None, stopwords=None):
         self.service = SessionServer(path)
         self.deaccent = deaccent
         self.lowercase = lowercase
         self.preprocess = preprocess
+        self.stemmer = stemmer
+        self.stopwords = stopwords
 
     def find_similar(self, data, min_score, max_results):
         if isinstance(data, basestring):
             doc = data.strip()
             if ' ' in doc:
-                doc = {'tokens': self.preprocess(data, self.deaccent, self.lowercase)}
+                doc = {'tokens': self.preprocess(data, deacc=self.deaccent,
+                    lowercase=self.lowercase, errors='ignore',
+                    stemmer=self.stemmer, stopwords=self.stopwords)}
             try:
                 return {'status': 'OK', 'response':
                                     self.service.find_similar(doc,
@@ -55,7 +60,9 @@ class SimService(object):
                 self.service.buffer([{'id': d['id'], 'tokens': d['tokens']}])
             else:
                 self.service.buffer([{'id': d['id'],
-                    'tokens': self.preprocess(d['text'], self.deaccent, self.lowercase)}])
+                    'tokens': list(self.preprocess(d['text'], deacc=self.deaccent,
+                    lowercase=self.lowercase, errors='ignore',
+                    stemmer=self.stemmer, stopwords=self.stopwords))}])
             i+=1
         return i
 

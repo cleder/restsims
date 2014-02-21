@@ -1,4 +1,5 @@
 import os
+import snowballstemmer
 from pyramid.view import view_config
 from pyramid.response import Response
 
@@ -9,11 +10,15 @@ except ImportError:
 import utils
 import simservice
 
-#service = simservice.SimService(os.path.join(simservice.path, 'unigram'),
-#    preprocess = utils.simple_preprocess, deaccent=True, lowercase=True)
+service1 = simservice.SimService(os.path.join(simservice.path, 'unigram'),
+    preprocess = utils.simple_preprocess, deaccent=True, lowercase=True,
+    stemmer=snowballstemmer.stemmer('english'), stopwords=utils.STOPWORDS)
 
-service = simservice.SimService(os.path.join(simservice.path, 'bigram'),
-    preprocess = utils.bigram_preprocess, deaccent=True, lowercase=True)
+service2 = simservice.SimService(os.path.join(simservice.path, 'bigram'),
+    preprocess = utils.bigram_preprocess, deaccent=True, lowercase=True,
+    stemmer=snowballstemmer.stemmer('english'), stopwords=utils.STOPWORDS)
+
+service = service2
 
 class SimServerViews(object):
 

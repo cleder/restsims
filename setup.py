@@ -12,6 +12,7 @@ requires = [
     'waitress',
     'simserver',
     'Bottleneck',
+    'snowballstemmer',
     ]
 
 setup(name='restsims',
